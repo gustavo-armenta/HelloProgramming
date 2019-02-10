@@ -24,19 +24,21 @@ namespace MyClassLibrary
             {
                 for (int i = left; i < right; i++)
                 {
-                    char aux = a[left];
+                    char c = a[left];
                     a[left] = a[i];
-                    a[i] = aux;
+                    a[i] = c;
                     PrivatePermute(a, left + 1, right, results);
-                    aux = a[left];
+                    c = a[left];
                     a[left] = a[i];
-                    a[i] = aux;
+                    a[i] = c;
                 }
             }
         }
 
-        public bool FindPathInMaze(int[,] maze, int w, int h)
+        public bool FindPathInMaze(int[,] maze)
         {
+            int w = maze.GetLength(0);
+            int h = maze.GetLength(1);
             var solution = new int[w, h];
             return PrivateFindPathInMaze(solution, maze, w, h, 0, 0, w - 1, h - 1);
         }

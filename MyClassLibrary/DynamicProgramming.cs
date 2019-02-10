@@ -115,5 +115,38 @@ namespace MyClassLibrary
 
             return table;
         }
+
+        public int MinEditDistance(string s1, string s2)
+        {
+            int rows = s1.Length + 1;
+            int columns = s2.Length + 1;
+            int[,] dp = new int[rows, columns];
+            for (int r = 0; r < rows; r++)
+            {
+                dp[r, 0] = r;
+            }
+            for (int c = 0; c < columns; c++)
+            {
+                dp[0, c] = c;
+            }
+            for (int r = 1; r < rows; r++)
+            {
+                for (int c = 1; c < columns; c++)
+                {
+                    if (s1[r - 1] == s2[c - 1])
+                    {
+                        dp[r, c] = dp[r - 1, c - 1];
+                    }
+                    else
+                    {
+                        dp[r, c] = Math.Min(dp[r - 1, c], dp[r, c - 1]);
+                        dp[r, c] = Math.Min(dp[r - 1, c - 1], dp[r, c]);
+                        dp[r, c] = dp[r, c] + 1;
+                    }
+                }
+            }
+
+            return dp[rows - 1, columns - 1];
+        }
     }
 }

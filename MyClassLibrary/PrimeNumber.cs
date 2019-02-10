@@ -9,7 +9,11 @@ namespace MyClassLibrary
         public List<int> FindAll(int value)
         {
             List<int> list = new List<int>();
-            for (int i = 2; i < value; i++)
+            if (value >= 2)
+            {
+                list.Add(2);
+            }
+            for (int i = 3; i <= value; i += 2)
             {
                 bool isPrime = true;
                 for (int j = 0; j < list.Count; j++)

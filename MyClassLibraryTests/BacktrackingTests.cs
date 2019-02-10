@@ -23,7 +23,7 @@ namespace MyClassLibraryTests
             int w = 10;
             int h = 10;
             var m = new int[w, h];
-            Assert.AreEqual(true, p.FindPathInMaze(m, w, h));
+            Assert.AreEqual(true, p.FindPathInMaze(m));
         }
     }
 }

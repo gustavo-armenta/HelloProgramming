@@ -48,5 +48,12 @@ namespace MyClassLibraryTests
             int[] coins = new int[] { 1, 2, 5, 10, 25 };
             Assert.AreEqual(expected, p.MinCoinChange(coins, 100).ToCsv());
         }
+
+        [TestMethod]
+        public void MinEditDistance()
+        {
+            DynamicProgramming p = new DynamicProgramming();
+            Assert.AreEqual(8, p.MinEditDistance("abcdefghijkl", "zyxdefgmno"));
+        }
     }
 }
