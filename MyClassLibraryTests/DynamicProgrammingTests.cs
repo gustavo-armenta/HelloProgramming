@@ -36,8 +36,8 @@ namespace MyClassLibraryTests
         public void LongestCommonSubsequence()
         {
             DynamicProgramming p = new DynamicProgramming();
-            Assert.AreEqual("", p.LongestCommonSubsequence("ABCDEF", "GHIJKLM", 6, 7));
-            Assert.AreEqual("GTAB", p.LongestCommonSubsequence("AGGTAB", "GXTXAYB", 6, 7));
+            Assert.AreEqual("", p.LongestCommonSubsequence("ABCDEF", "GHIJKLM"));
+            Assert.AreEqual("GTAB", p.LongestCommonSubsequence("AGGTAB", "GXTXAYB"));
         }
 
         [TestMethod]
@@ -54,6 +54,15 @@ namespace MyClassLibraryTests
         {
             DynamicProgramming p = new DynamicProgramming();
             Assert.AreEqual(8, p.MinEditDistance("abcdefghijkl", "zyxdefgmno"));
+        }
+
+        [TestMethod]
+        public void Knapsack()
+        {
+            DynamicProgramming p = new DynamicProgramming();
+            int[] weights = new int[] { 10, 20, 30 };
+            int[] values = new int[] { 60, 100, 120 };            
+            Assert.AreEqual(220, p.Knapsack(values.Length, 50, weights, values));
         }
     }
 }

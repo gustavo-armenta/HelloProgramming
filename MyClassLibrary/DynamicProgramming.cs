@@ -43,8 +43,10 @@ namespace MyClassLibrary
             return list;
         }
 
-        public string LongestCommonSubsequence(string sm, string sn, int m, int n)
+        public string LongestCommonSubsequence(string sm, string sn)
         {
+            int m = sm.Length;
+            int n = sn.Length;
             List<char> c = new List<char>();
             int[,] L = new int[m + 1, n + 1];
             for (int i = 0; i <= m; i++)
@@ -93,11 +95,11 @@ namespace MyClassLibrary
 
         public int[] MinCoinChange(int[] coins, int value)
         {
-            int[] table = new int[value + 1];
-            table[0] = 0;
-            for (int i = 1; i < table.Length; i++)
+            int[] results = new int[value + 1];
+            results[0] = 0;
+            for (int i = 1; i < results.Length; i++)
             {
-                table[i] = int.MaxValue;
+                results[i] = int.MaxValue - 1;
             }
 
             for (int i = 1; i <= value; i++)
@@ -106,14 +108,16 @@ namespace MyClassLibrary
                 {
                     if (coins[j] <= i)
                     {
-                        int sub_res = table[i - coins[j]];
-                        if (sub_res != int.MaxValue && sub_res + 1 < table[i])
-                            table[i] = sub_res + 1;
+                        int option = results[i - coins[j]] + 1;
+                        if (results[i] > option)
+                        {
+                            results[i] = option;
+                        }
                     }
                 }
             }
 
-            return table;
+            return results;
         }
 
         public int MinEditDistance(string s1, string s2)
@@ -147,6 +151,27 @@ namespace MyClassLibrary
             }
 
             return dp[rows - 1, columns - 1];
+        }
+
+        public int Knapsack(int n, int w, int[] weights, int[] values)
+        {
+            int[,] dp = new int[n + 1, w + 1];
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= w; j++)
+                {
+                    if (weights[i - 1] <= j)
+                    {
+                        dp[i, j] = Math.Max(dp[i - 1, j], values[i - 1] + dp[i - 1, j - weights[i - 1]]);
+                    }
+                    else
+                    {
+                        dp[i, j] = dp[i - 1, j];
+                    }
+                }
+            }
+
+            return dp[n, w];
         }
     }
 }
