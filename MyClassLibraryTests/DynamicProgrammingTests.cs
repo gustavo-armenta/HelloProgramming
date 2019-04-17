@@ -60,9 +60,8 @@ namespace MyClassLibraryTests
         public void Knapsack()
         {
             DynamicProgramming p = new DynamicProgramming();
-            int[] weights = new int[] { 10, 20, 30 };
-            int[] values = new int[] { 60, 100, 120 };            
-            Assert.AreEqual(220, p.Knapsack(values.Length, 50, weights, values));
+            var items = new (int Weight, int Value)[] { (10, 60), (20, 100), (30, 120) };
+            Assert.AreEqual(220, p.Knapsack(50, items));
         }
     }
 }

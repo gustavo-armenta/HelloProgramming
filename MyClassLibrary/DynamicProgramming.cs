@@ -153,16 +153,18 @@ namespace MyClassLibrary
             return dp[rows - 1, columns - 1];
         }
 
-        public int Knapsack(int n, int w, int[] weights, int[] values)
+        public int Knapsack(int maxWeight, (int Weight, int Value)[] items)
         {
-            int[,] dp = new int[n + 1, w + 1];
+            int n = items.Length;
+            int[,] dp = new int[n + 1, maxWeight + 1];
             for (int i = 1; i <= n; i++)
             {
-                for (int j = 1; j <= w; j++)
+                var item = items[i - 1];
+                for (int j = 1; j <= maxWeight; j++)
                 {
-                    if (weights[i - 1] <= j)
+                    if (item.Weight <= j)
                     {
-                        dp[i, j] = Math.Max(dp[i - 1, j], values[i - 1] + dp[i - 1, j - weights[i - 1]]);
+                        dp[i, j] = Math.Max(dp[i - 1, j], dp[i - 1, j - item.Weight] + item.Value);
                     }
                     else
                     {
@@ -171,7 +173,7 @@ namespace MyClassLibrary
                 }
             }
 
-            return dp[n, w];
+            return dp[n, maxWeight];
         }
     }
 }

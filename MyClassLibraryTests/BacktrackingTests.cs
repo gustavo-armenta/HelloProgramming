@@ -25,5 +25,22 @@ namespace MyClassLibraryTests
             var m = new int[w, h];
             Assert.AreEqual(true, p.FindPathInMaze(m, 0, 0, w - 1, h - 1));
         }
+
+        [TestMethod]
+        public void FindWordBoggle()
+        {
+            Backtracking p = new Backtracking();
+            var a = new char[,]
+            {
+                { '*','*','*','*','*','*' },
+                { '*','*','L','*','*','*' },
+                { '*','C','D','O','*','*' },
+                { '*','*','U','*','*','*' },
+                { '*','*','*','*','*','*' },
+                { '*','*','*','*','*','*' },
+            };
+            Assert.AreEqual(true, p.FindWordBoggle(a,"CLOUD"));
+            Assert.AreEqual(false, p.FindWordBoggle(a, "CLOUDO"));
+        }
     }
 }
