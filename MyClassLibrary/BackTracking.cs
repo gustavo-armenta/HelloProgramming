@@ -39,29 +39,19 @@ namespace MyClassLibrary
             int w = maze.GetLength(0);
             int h = maze.GetLength(1);
             var solution = new int[w, h];
-            return PrivateFindPathInMaze(solution, maze, w, h, x, y, endx, endy);
+            return InternalFindPathInMaze(maze, x, y, endx, endy, w, h, solution);
         }
 
-        private bool PrivateFindPathInMaze(int[,] solution, int[,] maze, int w, int h, int x, int y, int endx, int endy)
+        private bool InternalFindPathInMaze(int[,] maze, int x, int y, int endx, int endy, int w, int h, int[,] solution)
         {
-            if (x >= w || y >= h)
-            {
-                return false;
-            }
-            if (maze[x, y] != 0)
+            if (x >= w || y >= h || maze[x, y] != 0)
             {
                 return false;
             }
             solution[x, y] = 1;
-            if (x == endx && y == endy)
-            {
-                return true;
-            }
-            if (PrivateFindPathInMaze(solution, maze, w, h, x + 1, y, endx, endy))
-            {
-                return true;
-            }
-            if (PrivateFindPathInMaze(solution, maze, w, h, x, y + 1, endx, endy))
+            if (x == endx && y == endy
+                || InternalFindPathInMaze(maze, x + 1, y + 0, endx, endy, w, h, solution)
+                || InternalFindPathInMaze(maze, x + 0, y + 1, endx, endy, w, h, solution))
             {
                 return true;
             }
@@ -92,25 +82,23 @@ namespace MyClassLibrary
             {
                 return false;
             }
-            else if (a[i, j] == w[iw])
+            if (a[i, j] == w[iw])
             {
                 v[i, j] = true;
-                if (iw + 1 >= w.Length
-                    || InternalBoggle(a, w, v, iw + 1, i, j - 1)
-                    || InternalBoggle(a, w, v, iw + 1, i, j + 1)
-                    || InternalBoggle(a, w, v, iw + 1, i + 1, j - 1)
-                    || InternalBoggle(a, w, v, iw + 1, i + 1, j)
-                    || InternalBoggle(a, w, v, iw + 1, i + 1, j + 1)
-                    || InternalBoggle(a, w, v, iw + 1, i - 1, j - 1)
-                    || InternalBoggle(a, w, v, iw + 1, i - 1, j)
-                    || InternalBoggle(a, w, v, iw + 1, i - 1, j + 1))
+                var niw = iw + 1;
+                if (niw >= w.Length
+                    || InternalBoggle(a, w, v, niw, i + 0, j - 1)
+                    || InternalBoggle(a, w, v, niw, i + 0, j + 1)
+                    || InternalBoggle(a, w, v, niw, i + 1, j - 1)
+                    || InternalBoggle(a, w, v, niw, i + 1, j + 0)
+                    || InternalBoggle(a, w, v, niw, i + 1, j + 1)
+                    || InternalBoggle(a, w, v, niw, i - 1, j - 1)
+                    || InternalBoggle(a, w, v, niw, i - 1, j + 0)
+                    || InternalBoggle(a, w, v, niw, i - 1, j + 1))
                 {
                     return true;
                 }
-                else
-                {
-                    v[i, j] = false;
-                }
+                v[i, j] = false;
             }
 
             return false;

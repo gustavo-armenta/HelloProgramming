@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MyClassLibrary
 {
@@ -29,63 +26,68 @@ namespace MyClassLibrary
             _graph = graph;
         }
 
-        public List<T> TopologicalSort()
+        public List<T> TopologicalSort_Kahn()
         {
-            var result = new List<T>();
-            var visited = new SortedDictionary<T, bool>();
-            foreach (var key in _graph.Keys)
+            var list = new List<T>();
+            var refs = new Dictionary<T, int>();
+            var q = new Queue<T>();
+            foreach (var node in _graph.Keys)
             {
-                visited.Add(key, false);
+                refs.Add(node, 0);
             }
-            foreach (var node in visited.Keys.ToArray())
+            foreach (var node in _graph.Keys)
             {
-                if (!IsChild(node))
-                {
-                    dfs(node, visited, result);
-                }
-            }
-            return result;
-        }
-
-        // Find shortest path in graph without negative edges and cycles
-        public SortedDictionary<T, int> Dijkstra(T sourceNode)
-        {
-            var minQueue = new SortedDictionary<int, HashSet<T>>();
-            var distances = new SortedDictionary<T, int>();
-            minQueue.Add(0, new HashSet<T>());
-            minQueue[0].Add(sourceNode);
-            while (minQueue.Count > 0)
-            {
-                int distance = minQueue.Keys.First();
-                T node = minQueue[distance].First();
-                minQueue[distance].Remove(node);
-                if (minQueue[distance].Count == 0)
-                {
-                    minQueue.Remove(distance);
-                }
-                if (!distances.ContainsKey(node))
-                {
-                    distances.Add(node, distance);
-                }
-                else if (distances[node] > distance)
-                {
-                    distances[node] = distance;
-                }
                 foreach (var edge in _graph[node])
                 {
-                    int nextDistance = distances[node] + edge.Cost;
-                    if (!minQueue.ContainsKey(nextDistance))
+                    refs[edge.To]++;
+                }
+            }
+            foreach (var (node, v) in refs)
+            {
+                if (v > 0) continue;
+                q.Enqueue(node);
+
+            }
+            while (q.Count > 0)
+            {
+                var node = q.Dequeue();
+                list.Add(node);
+                foreach (var edge in _graph[node])
+                {
+                    if (--refs[edge.To] == 0)
                     {
-                        minQueue.Add(nextDistance, new HashSet<T>());
+                        q.Enqueue(edge.To);
                     }
-                    if (!minQueue[nextDistance].Contains(edge.To))
+                }
+            }
+            return list;
+        }
+
+        // Find shortest path in graph without negative edges and without cycles
+        public IDictionary<T, (int distance, T parent)> ShortestDistance_Dijkstra(T sourceNode)
+        {
+            var map = new Dictionary<T, (int distance, T parent)>();
+            foreach (var node in _graph.Keys)
+            {
+                map.Add(node, (int.MaxValue, default));
+            }
+
+            var minq = new MinHeap<int, (T node, T parent)>();
+            minq.Enqueue(0, (sourceNode, default));
+            while (minq.Count > 0)
+            {
+                var item = minq.Dequeue();
+                if (item.key < map[item.value.node].distance)
+                {
+                    map[item.value.node] = (item.key, item.value.parent);
+                    foreach (var edge in _graph[item.value.node])
                     {
-                        minQueue[nextDistance].Add(edge.To);
+                        minq.Enqueue(map[item.value.node].distance + edge.Cost, (edge.To, item.value.node));
                     }
                 }
             }
 
-            return distances;
+            return map;
         }
 
         // Find shortest path without the restrictions of Dijkstra of only positive costs and no graph cycles
@@ -95,32 +97,34 @@ namespace MyClassLibrary
         public void FloydWarshall()
         {
         }
-        
 
-        private bool IsChild(T node)
+        public IDictionary<T, (int distance, T parent)> MinimumSpanningTree_Prim()
         {
-            foreach (var (k, v) in _graph)
+            T sourceNode = default(T);
+            var map = new Dictionary<T, (int distance, T parent)>();
+            foreach (var node in _graph.Keys)
             {
-                foreach (var item in v)
+                map.Add(node, (int.MaxValue, default));
+                if (default(T).Equals(sourceNode) || _graph[node].Count > _graph[sourceNode].Count)
+                    sourceNode = node;
+            }
+
+            var minq = new MinHeap<int, (T node, T parent)>();
+            minq.Enqueue(0, (sourceNode, default));
+            while (minq.Count > 0)
+            {
+                var item = minq.Dequeue();
+                if (item.key < map[item.value.node].distance)
                 {
-                    if (item.To.Equals(node))
+                    map[item.value.node] = (item.key, item.value.parent);
+                    foreach (var edge in _graph[item.value.node])
                     {
-                        return true;
+                        minq.Enqueue(edge.Cost, (edge.To, item.value.node));
                     }
                 }
             }
-            return false;
-        }
 
-        private void dfs(T node, SortedDictionary<T, bool> visited, List<T> result)
-        {
-            if (visited[node]) return;
-            visited[node] = true;
-            foreach (var child in _graph[node])
-            {
-                dfs(child.To, visited, result);
-            }
-            result.Add(node);
+            return map;
         }
     }
 }

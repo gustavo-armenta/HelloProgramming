@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MyClassLibrary;
+using System.Linq;
 
 namespace MyClassLibraryTests
 {
@@ -87,6 +88,23 @@ namespace MyClassLibraryTests
             Assert.AreEqual("", balancedTree.FindPath(60).ToCsv());
             Assert.AreEqual("", balancedTree.FindPath(110).ToCsv());
             Assert.AreEqual("", balancedTree.FindPath(200).ToCsv());
+        }
+
+        [TestMethod]
+        public void CreateSubtree()
+        {
+            var node = new BinaryTree<ColorNode>(new ColorNode('A', false));
+            node.Left = new BinaryTree<ColorNode>(new ColorNode('B', false));
+            node.Right = new BinaryTree<ColorNode>(new ColorNode('C', false));
+            node.Left.Left = new BinaryTree<ColorNode>(new ColorNode('D', false));
+            node.Left.Right = new BinaryTree<ColorNode>(new ColorNode('E', true));
+            node.Right.Left = new BinaryTree<ColorNode>(new ColorNode('F', true));
+            node.Right.Right = new BinaryTree<ColorNode>(new ColorNode('G', false));
+
+            var clone = node.CreateSubtree(node);
+            var clones = clone.Preorder();
+            var list = clones.Select(c => c.Value);
+            Assert.AreEqual("A,B,E,C,F", list.ToCsv());
         }
 
         [TestMethod]

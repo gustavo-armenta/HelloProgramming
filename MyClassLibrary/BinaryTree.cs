@@ -9,24 +9,87 @@ namespace MyClassLibrary
         public BinaryTree<T> Right { get; set; }
         public T Value { get; set; }
 
+        public BinaryTree()
+        {
+        }
+
+        public BinaryTree(T value)
+        {
+            this.Value = value;
+        }
+
         public List<T> Preorder()
         {
-            List<T> list = new List<T>();
-            this.PrivatePreorder(this, list);
+            // recursion solution is print, left, right
+            // iteration solution is pop, print, push right, push left
+            var list = new List<T>();
+            var stack = new Stack<BinaryTree<T>>();
+            stack.Push(this);
+            while (stack.Count > 0)
+            {
+                var node = stack.Pop();
+                list.Add(node.Value);
+                if (node.Right != null)
+                {
+                    stack.Push(node.Right);
+                }
+                if (node.Left != null)
+                {
+                    stack.Push(node.Left);
+                }
+            }
+
             return list;
         }
 
         public List<T> Inorder()
         {
-            List<T> list = new List<T>();
-            this.PrivateInorder(this, list);
+            // recursion solution is left, print, right
+            // iteration solution is push many left, pop, print, push right
+            var list = new List<T>();
+            var stack = new Stack<BinaryTree<T>>();
+            var node = this;
+            while (node != null || stack.Count > 0)
+            {
+                while (node != null)
+                {
+                    stack.Push(node);
+                    node = node.Left;
+                }
+
+                node = stack.Pop();
+                list.Add(node.Value);
+                node = node.Right;
+            }
+
             return list;
         }
 
         public List<T> Postorder()
         {
+            // recursion solution is left, right, print
+            // iterative solution is 2 stacks and 2 loops
             List<T> list = new List<T>();
-            this.PrivatePostorder(this, list);
+            var s1 = new Stack<BinaryTree<T>>();
+            var s2 = new Stack<BinaryTree<T>>();
+            var node = this;
+            s1.Push(node);
+            while(s1.Count > 0)
+            {
+                node = s1.Pop();
+                s2.Push(node);
+                if (node.Left != null)
+                    s1.Push(node.Left);
+                if (node.Right != null)
+                    s1.Push(node.Right);
+            }
+
+            while(s2.Count > 0)
+            {
+                node = s2.Pop();
+                list.Add(node.Value);
+            }
+            
             return list;
         }
 
@@ -34,7 +97,7 @@ namespace MyClassLibrary
         {
             int count = 0;
             int level = 0;
-            this.PrivateIsBalanced(this, ref count, ref level, 0);
+            this.InternalIsBalanced(this, ref count, ref level, 0);
             double expected = Math.Ceiling(Math.Log(count + 1, 2));
             if (expected > 2)
             {
@@ -49,7 +112,7 @@ namespace MyClassLibrary
         public List<T> FindPath(T value)
         {
             Stack<T> stack = new Stack<T>();
-            this.PrivateFindPath(this, stack, value);
+            this.InternalFindPath(this, stack, value);
             List<T> list = new List<T>();
             while (stack.Count > 0)
             {
@@ -82,17 +145,33 @@ namespace MyClassLibrary
             return result;
         }
 
+        public BinaryTree<ColorNode> CreateSubtree(BinaryTree<ColorNode> node)
+        {
+            if (node == null) return null;
+            var clone = new BinaryTree<ColorNode>(new ColorNode(node.Value.Value, node.Value.IsColored));
+            var left = CreateSubtree(node.Left);
+            if (left != null) clone.Left = left;
+            var right = CreateSubtree(node.Right);
+            if (right != null) clone.Right = right;
+            if (clone.Value.IsColored || clone.Left != null || clone.Right != null)
+            {
+                return clone;
+            }
+
+            return null;
+        }
+
         public BinaryTree<T> BuildUsingInorderPreorder(List<T> inorder, List<T> preorder)
         {
-            return this.PrivateBuildUsingInorderPreorder(new Span<T>(inorder.ToArray()), new Span<T>(preorder.ToArray()));
+            return this.InternalBuildUsingInorderPreorder(new Span<T>(inorder.ToArray()), new Span<T>(preorder.ToArray()));
         }
 
         public BinaryTree<T> BuildUsingInorderPostorder(List<T> inorder, List<T> postorder)
         {
-            return this.PrivateBuildUsingInorderPostorder(new Span<T>(inorder.ToArray()), new Span<T>(postorder.ToArray()));
+            return this.InternalBuildUsingInorderPostorder(new Span<T>(inorder.ToArray()), new Span<T>(postorder.ToArray()));
         }
 
-        private void PrivatePreorder(BinaryTree<T> node, List<T> list)
+        private void InternalPreorder(BinaryTree<T> node, List<T> list)
         {
             if (node == null)
             {
@@ -100,35 +179,35 @@ namespace MyClassLibrary
             }
 
             list.Add(node.Value);
-            this.PrivatePreorder(node.Left, list);
-            this.PrivatePreorder(node.Right, list);
+            this.InternalPreorder(node.Left, list);
+            this.InternalPreorder(node.Right, list);
         }
 
-        private void PrivateInorder(BinaryTree<T> node, List<T> list)
+        private void InternalInorder(BinaryTree<T> node, List<T> list)
         {
             if (node == null)
             {
                 return;
             }
 
-            this.PrivateInorder(node.Left, list);
+            this.InternalInorder(node.Left, list);
             list.Add(node.Value);
-            this.PrivateInorder(node.Right, list);
+            this.InternalInorder(node.Right, list);
         }
 
-        private void PrivatePostorder(BinaryTree<T> node, List<T> list)
+        private void InternalPostorder(BinaryTree<T> node, List<T> list)
         {
             if (node == null)
             {
                 return;
             }
 
-            this.PrivatePostorder(node.Left, list);
-            this.PrivatePostorder(node.Right, list);
+            this.InternalPostorder(node.Left, list);
+            this.InternalPostorder(node.Right, list);
             list.Add(node.Value);
         }
 
-        private void PrivateIsBalanced(BinaryTree<T> node, ref int count, ref int level, int curLevel)
+        private void InternalIsBalanced(BinaryTree<T> node, ref int count, ref int level, int curLevel)
         {
             if (node == null)
             {
@@ -142,11 +221,11 @@ namespace MyClassLibrary
                 level = curLevel;
             }
 
-            this.PrivateIsBalanced(node.Left, ref count, ref level, curLevel);
-            this.PrivateIsBalanced(node.Right, ref count, ref level, curLevel);
+            this.InternalIsBalanced(node.Left, ref count, ref level, curLevel);
+            this.InternalIsBalanced(node.Right, ref count, ref level, curLevel);
         }
 
-        private bool PrivateFindPath(BinaryTree<T> node, Stack<T> stack, T value)
+        private bool InternalFindPath(BinaryTree<T> node, Stack<T> stack, T value)
         {
             if (node == null)
             {
@@ -155,8 +234,8 @@ namespace MyClassLibrary
 
             stack.Push(node.Value);
             if (object.Equals(node.Value, value) ||
-                this.PrivateFindPath(node.Left, stack, value) ||
-                this.PrivateFindPath(node.Right, stack, value))
+                this.InternalFindPath(node.Left, stack, value) ||
+                this.InternalFindPath(node.Right, stack, value))
             {
                 return true;
             }
@@ -165,7 +244,7 @@ namespace MyClassLibrary
             return false;
         }
 
-        private BinaryTree<T> PrivateBuildUsingInorderPreorder(Span<T> inorder, Span<T> preorder)
+        private BinaryTree<T> InternalBuildUsingInorderPreorder(Span<T> inorder, Span<T> preorder)
         {
             if (inorder.Length != preorder.Length)
             {
@@ -189,12 +268,12 @@ namespace MyClassLibrary
 
             BinaryTree<T> node = new BinaryTree<T>();
             node.Value = preorder[0];
-            node.Left = this.PrivateBuildUsingInorderPreorder(inorder.Slice(0, leftLength), preorder.Slice(1, leftLength));
-            node.Right = this.PrivateBuildUsingInorderPreorder(inorder.Slice(inorder.Length - rightLength, rightLength), preorder.Slice(preorder.Length - rightLength, rightLength));
+            node.Left = this.InternalBuildUsingInorderPreorder(inorder.Slice(0, leftLength), preorder.Slice(1, leftLength));
+            node.Right = this.InternalBuildUsingInorderPreorder(inorder.Slice(inorder.Length - rightLength, rightLength), preorder.Slice(preorder.Length - rightLength, rightLength));
             return node;
         }
 
-        private BinaryTree<T> PrivateBuildUsingInorderPostorder(Span<T> inorder, Span<T> postorder)
+        private BinaryTree<T> InternalBuildUsingInorderPostorder(Span<T> inorder, Span<T> postorder)
         {
             if (inorder.Length != postorder.Length)
             {
@@ -218,9 +297,21 @@ namespace MyClassLibrary
 
             BinaryTree<T> node = new BinaryTree<T>();
             node.Value = postorder[postorder.Length - 1];
-            node.Left = this.PrivateBuildUsingInorderPostorder(inorder.Slice(0, leftLength), postorder.Slice(0, leftLength));
-            node.Right = this.PrivateBuildUsingInorderPostorder(inorder.Slice(inorder.Length - rightLength, rightLength), postorder.Slice(postorder.Length - rightLength - 1, rightLength));
+            node.Left = this.InternalBuildUsingInorderPostorder(inorder.Slice(0, leftLength), postorder.Slice(0, leftLength));
+            node.Right = this.InternalBuildUsingInorderPostorder(inorder.Slice(inorder.Length - rightLength, rightLength), postorder.Slice(postorder.Length - rightLength - 1, rightLength));
             return node;
+        }
+    }
+
+    public class ColorNode
+    {
+        public char Value { get; set; }
+        public bool IsColored { get; set; }
+
+        public ColorNode(char value, bool isColored)
+        {
+            Value = value;
+            IsColored = isColored;
         }
     }
 }
